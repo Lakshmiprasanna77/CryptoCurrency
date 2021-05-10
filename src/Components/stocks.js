@@ -1,6 +1,8 @@
 import React from "react";
+import { Link } from "react-router-dom";
+import axios from "axios";
 
-const Posts = ({ stocks, loading }) => {
+const Posts = ({ view, stocks, loading, updateToView, deleteStock }) => {
   if (loading) {
     return <h2>loading....</h2>;
   }
@@ -8,7 +10,23 @@ const Posts = ({ stocks, loading }) => {
     <table
       onClick={(e) => {
         var list = e.target.parentElement.parentElement.childNodes;
-        console.log(list);
+        if (e.target.innerText === "save data") {
+          axios
+            .post("http://localhost:5000/insert", {
+              name: list[0].innerText,
+              symbol: list[1].innerText,
+              max_supply: parseInt(list[2].innerText),
+            })
+            .then((res) => {
+              updateToView(list[0].innerText);
+            });
+        } else if (e.target.innerText === "Delete") {
+          deleteStock(
+            list[0].innerText,
+            list[1].innerText,
+            parseInt(list[2].innerText)
+          );
+        }
       }}
       className="table table-striped mt-4"
     >
@@ -26,11 +44,27 @@ const Posts = ({ stocks, loading }) => {
               <td>{stock.name}</td>
               <td>{stock.symbol}</td>
               <td>{stock.max_supply}</td>
-              <td>
-                <button type="button" className="btn btn-primary mt-1">
-                  save data
-                </button>
-              </td>
+              {view ? (
+                <td>
+                  <button type="button" className="btn btn-danger mt-1">
+                    Delete
+                  </button>
+                </td>
+              ) : (
+                <td>
+                  {stock.existed ? (
+                    <Link to={`/view`}>
+                      <button type="button" className="btn btn-secondary mt-1">
+                        view data
+                      </button>
+                    </Link>
+                  ) : (
+                    <button type="button" className="btn btn-primary mt-1">
+                      save data
+                    </button>
+                  )}
+                </td>
+              )}
             </tr>
           );
         })}

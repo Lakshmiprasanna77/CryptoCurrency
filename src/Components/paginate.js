@@ -26,6 +26,7 @@ class pagination extends Component {
               }}
               type="button"
               className="btn btn-primary"
+              disabled={currentPage === 1}
             >
               Previous
             </button>
